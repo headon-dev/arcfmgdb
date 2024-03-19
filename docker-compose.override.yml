@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:80'
+    environment:
+      APP_ENV: dev
+      PYTHONDONTWRITEBYTECODE: 1
+    volumes:
+      - ./src/arcfmgdb:/home/python/application/arcfmgdb
+      - ${UPLOAD_QUEUE}:/home/python/application/spool/UPLOAD_QUEUE
+      - ./spool/UPLOADED_FILES:/home/python/application/spool/UPLOADED_FILES
+      - ${OUTPUT_GEOJSON_FILES}:/home/python/application/spool/OUTPUT_GEOJSON_FILES
+
+  database:
+    ports:
+      - "5433:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - mangment
+    environment:
+      PGADMIN_DEFAULT_EMAIL: a@a.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    ports:
+      - '80:80'
+
+  # ogr:
+  #   # image: ghcr.io/osgeo/gdal:alpine-normal-latest
+  #   image: geodata/gdal:1.11.5
+  #   # command: ogr2ogr -f "PostgreSQL"  PG:"host=database1 port=5432 dbname=postgres user=postgres password=postgres"  /data/BNTL_MALE_ARZI.GDB  -overwrite -progress --config PG_USE_COPY YES
+  #   # command: ogr2ogr -f "PostgreSQL"  PG:"host=database port=5432 dbname=temp user=postgres password=postgres"  /data/data_iec.gdb  -overwrite -progress --config PG_USE_COPY YES
+  #   command: ogr2ogr -progress -f "PostgreSQL" PG:"dbname=temp host=database port=5432 user=postgres password=postgres" -overwrite -skipfailures --config PG_USE_COPY YES -lco GEOMETRY_NAME=shape -lco FID=objectid /data/data_iec.gdb
+  #   # command: ls -altr ./data
+  #   # command: ogrinfo /data/data_iec.gdb
+  #   # command: ogr2ogr --version
+  #   networks:
+  #     - internal
+  #   volumes:
+  #     - C:\dev\arcfmgdb\spool\UPLOAD_QUEUE:/data
+  #     # - C:\dev\partner-import/GeoData/BNTL_MALE_ARZI:/data
+
+networks:
+  mangment:
+    external: true

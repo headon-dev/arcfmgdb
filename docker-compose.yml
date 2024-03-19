@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  application:
+    image: arcfmgdb
+    environment:
+      TZ: Asia/Jerusalem
+    volumes:
+      - ${UPLOAD_QUEUE}:/home/python/application/spool/UPLOAD_QUEUE
+      - ./spool/UPLOADED_FILES:/home/python/application/spool/UPLOADED_FILES
+      - ${OUTPUT_GEOJSON_FILES}:/home/python/application/spool/OUTPUT_GEOJSON_FILES
+    env_file:
+      - .env
+    logging:
+      options:
+        max-file: 2
+        max-size: "25m"
+    networks:
+      internal:
+
+
+  database:
+    image: cimg/postgres:12.8-postgis
+    restart: unless-stopped
+    networks:
+      internal:
+        aliases:
+          - database
+      mangment:
+    volumes:
+      - 'database:/var/lib/postgresql/data:rw'
+    environment:
+      TZ: Asia/Jerusalem
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_PASSWORD: ${PG_PSWD}
+
+volumes:
+  database:
+    driver: local
+
+networks:
+  mangment:
+    external: true
+  internal:
+    external: false

@@ -1,0 +1,15 @@
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Netanel Yahav", email = "natiy@headon.co.il"},
+]
+dependencies = [
+    "pyproj==3.3.0",
+    "geopy==2.0.0",
+    "psycopg2-binary==2.9.2",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
